@@ -1,0 +1,125 @@
+= Obversability with Camel Quarkus Artemis and Kafka
+
+This project aims to use Apache Camel to send and consume events from Artemis message broker, capture the tracing information and display it in Jaeger. 
+
+Also it has monitoring dashboard for Artemis.
+
+Component architecture:
+
+image::img/architecture.jpg[]
+
+* order-producer
+
+Each 3s save order to a MYSQL database and send the message to Kafka `camel-book`,  `activemq-book` topic and `activemq-book` and `camel-book` queue in Artemis.
+
+* order-artemis-consumer
+
+Consume messages from `activemq-book` and `camel-book` queue in Artemis. 
+
+
+== Tracing with multiple applications.
+
+Overall tracing
+
+image::img/tracing-0.png[]
+
+Tracing detail
+
+image::img/tracing.png[]
+
+Tracing FlameGraph
+
+image::img/tracing-flamegraph.png[]
+
+image::img/tracing-flamegraph-1.png[]
+
+image::img/tracing-flamegraph-2.png[]
+
+Tracing Statistics
+
+image::img/tracing-statistics.png[]
+
+== Monitoring
+
+Grafana collect metrics from prometheus and make it available through dashboards.
+
+AMQ Broker (Artemis) dashboard
+
+image::img/grafana-amq-broker.png[]
+
+== Other toolings
+
+AMQ Console 
+
+image::img/amq-console-broker-diagram.png[]
+
+image::img/amq-console-browse-queues.png[]
+
+image::img/amq-console-browse-queues-detail.png[]
+
+image::img/amq-console-browse-queues.png[]
+
+
+== Pre requirements
+
+. JDK 11+
+. Quarkus CLI
+. Docker
+. AMQ Broker Operator
+. AMQ Grafana Operator
+. Red Hat OpenShift distributed tracing platform
+
+== Local development
+
+. Init AMQ, Jaeger: `docker compose up`
+. Artemis Console: ``` http://localhost:8161/console/ ```
+. Jaeger Console: ```http://localhost:16686/search```  
+
+To run the apps: 
+
+Inside each project:
+
+    quarkus dev
+
+=== Generating application images
+
+Inside the order-artemis-consumer directory
+
+    mvn clean package
+    docker build -f src/main/docker/Dockerfile.jvm -t order-artemis-consumer .
+    docker tag order-artemis-consumer quay.io/hodrigohamalho/activemq-quarkus-tracing:order-artemis-consumer
+    docker push quay.io/hodrigohamalho/activemq-quarkus-tracing:order-artemis-consumer
+
+Inside the order-producer directory
+
+    mvn clean package
+    docker build -f src/main/docker/Dockerfile.jvm -t order-producer .
+    docker tag order-producer quay.io/hodrigohamalho/activemq-quarkus-tracing:order-producer
+    docker push quay.io/hodrigohamalho/activemq-quarkus-tracing:order-producer
+
+== Install the demo in Openshift with Ansible
+
+Install the following operators before running the playbooks:
+
+. AMQ Broker Operator
+. AMQ Grafana Operator
+. Red Hat OpenShift distributed tracing platform
+
+NOTE: I decided to remove Operators logic from the playbooks because it looks to broke whenever there is a new version of a Operator the playbooks starts to fail (It's annoying).
+
+=== Parameters
+
+[options="header"]
+|=======================
+| Parameter      | Example Value                                      | Definition
+| tkn     | sha256~vFanQbthlPKfsaldJT3bdLXIyEkd7ypO_XPygY1DNtQ | access token for a user with cluster-admin privileges
+| server    | https://api.mycluster.opentlc.com:6443             | OpenShift Cluster API URL
+|=======================
+
+=== Deploying the demo
+----
+export tkn=sha256~x
+export server=https://api.clust2er-6x8wc.6x8wc.sandbox773.opentlc.com:6443
+
+ansible-playbook -e token=${tkn} -e server=${server} playbook.yml
+----
