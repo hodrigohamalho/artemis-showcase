@@ -23,7 +23,7 @@ spec:
   deploymentPlan:
     enableMetricsPlugin: true
     jolokiaAgentEnabled: true
-    managementRBACEnabled: false
+    managementRBACEnabled: false 
     clustered: true
     extraMounts: {}
     image: placeholder
@@ -40,3 +40,17 @@ spec:
   upgrades:
     enabled: false
     minor: false
+  extraMounts:
+    secrets:
+    - "custom-jaas-config"
+  brokerProperties:
+  - securityRoles.#.readers.send=false
+  - securityRoles.#.readers.consume=true
+  - securityRoles.#.readers.createAddress=false
+  - securityRoles.#.readers.createNonDurableQueue=false
+  - securityRoles.#.readers.browse=true
+  - securityRoles.#.writers.send=true
+  - securityRoles.#.writers.consume=true
+  - securityRoles.#.writers.createAddress=true
+  - securityRoles.#.writers.createNonDurableQueue=true
+  - securityRoles.#.writers.browse=true

@@ -59,6 +59,12 @@ image::img/amq-console-browse-queues-detail.png[]
 
 image::img/amq-console-browse-queues.png[]
 
+== Security 
+
+https://docs.redhat.com/en/documentation/red_hat_amq_broker/7.12/html-single/deploying_amq_broker_on_openshift/index#assembly-br-configuring-security-operator_broker-ocp[Official documentation.]
+
+
+
 
 == Pre requirements
 
