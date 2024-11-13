@@ -8,10 +8,10 @@ public class MyRouteBuilder extends RouteBuilder {
     public void configure() throws Exception {
 
         from("amqp:queue:camel-book")
-            .log("Message received: ${body}");
+            .log("Message JSON received:\n ${body}");
 
         from("amqp:queue:activemq-book")
-            .log("Message received: ${body}");
+            .log("Message XML Received:\n ${body}");
 
     }
     

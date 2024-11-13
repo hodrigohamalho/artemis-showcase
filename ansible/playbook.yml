@@ -32,13 +32,13 @@
     #   include_role:
     #     name: amq-broker
 
-    - name: Include Applications
-      include_role:
-        name: apps
-
-    # - name: Include Monitoring
+    # - name: Include Applications
     #   include_role:
-    #     name: monitoring
+    #     name: apps
+
+    - name: Include Monitoring
+      include_role:
+        name: monitoring
     
 
     # - name: Telemetry

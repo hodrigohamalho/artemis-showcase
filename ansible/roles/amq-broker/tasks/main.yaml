@@ -25,14 +25,20 @@
 #   delay: 10
 #   until: r_amq_operator_pod.resources | list | length == 1
 
+- name: Create JAAS Secret
+  k8s:
+    state: present
+    namespace: '{{ namespace }}'
+    resource_definition: "{{ lookup('file', 'custom-jaas-config.yml') }}"
+
 - name: Create AMQ Broker instance
   k8s:
     state: present
     namespace: '{{ namespace }}'
     resource_definition: "{{ lookup('template', 'artemis-cluster.yml.j2') }}"
 
-- name: Create AMQ Broker Queue
+- name: Create AMQ Broker with Security
   k8s:
     state: present
     namespace: '{{ namespace }}'
-    resource_definition: "{{ lookup('file', 'artemis-queue.yml') }}"
+    resource_definition: "{{ lookup('template', 'artemis-cluster-security.yml.j2') }}"

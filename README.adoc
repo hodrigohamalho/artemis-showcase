@@ -63,6 +63,10 @@ image::img/amq-console-browse-queues.png[]
 
 https://docs.redhat.com/en/documentation/red_hat_amq_broker/7.12/html-single/deploying_amq_broker_on_openshift/index#assembly-br-configuring-security-operator_broker-ocp[Official documentation.]
 
+By default, AMQ Broker uses a Java Authentication and Authorization Service (JAAS) properties login module to authenticate and authorize users. The configuration for the default JAAS login module is stored in a /home/jboss/amq-broker/etc/login.config file on each broker Pod and reads user and role information from the artemis-users.properties and artemis-roles.properties files in the same directory. You add the user and role information to the properties files in the default login module by updating the ActiveMQArtemisSecurity Custom Resource (CR).
+
+An alternative to updating the ActiveMQArtemisSecurity CR to add user and role information to the default properties files is to configure one or more JAAS login modules in a secret. This secret is mounted as a file on each broker Pod. Configuring JAAS login modules in a secret offers the following advantages over using the ActiveMQArtemisSecurity CR to add user and role information.
+
 
 
 
@@ -124,8 +128,10 @@ NOTE: I decided to remove Operators logic from the playbooks because it looks to
 
 === Deploying the demo
 ----
-export tkn=sha256~x
-export server=https://api.clust2er-6x8wc.6x8wc.sandbox773.opentlc.com:6443
+export tkn=sha256~G5Oiebe1egoNhEqcVLR89M1D_ZhMqA_vx_n434StzrI
+export server=https://api.cluster-dgpkx.dgpkx.sandbox2178.opentlc.com:6443
 
 ansible-playbook -e token=${tkn} -e server=${server} playbook.yml
 ----
+
+
