@@ -67,9 +67,6 @@ By default, AMQ Broker uses a Java Authentication and Authorization Service (JAA
 
 An alternative to updating the ActiveMQArtemisSecurity CR to add user and role information to the default properties files is to configure one or more JAAS login modules in a secret. This secret is mounted as a file on each broker Pod. Configuring JAAS login modules in a secret offers the following advantages over using the ActiveMQArtemisSecurity CR to add user and role information.
 
-
-
-
 == Pre requirements
 
 . JDK 11+
@@ -127,11 +124,57 @@ NOTE: I decided to remove Operators logic from the playbooks because it looks to
 |=======================
 
 === Deploying the demo
-----
-export tkn=sha256~G5Oiebe1egoNhEqcVLR89M1D_ZhMqA_vx_n434StzrI
-export server=https://api.cluster-dgpkx.dgpkx.sandbox2178.opentlc.com:6443
 
-ansible-playbook -e token=${tkn} -e server=${server} playbook.yml
-----
+    export tkn=sha256~G5Oiebe1egoNhEqcVLR89M1D_ZhMqA_vx_n434StzrI
+    export server=https://api.cluster-dgpkx.dgpkx.sandbox2178.opentlc.com:6443
+    ansible-playbook -e token=${tkn} -e server=${server} playbook.yml
 
 
+=== External Access 
+
+Step 1: Create the broker keystore
+
+Note that I'm using the Java Keytool to generate the necessary certificates and stores for this example. First, generate a self-signed certificate for the broker keystore. When asked for a password, use password:
+
+    $ keytool -genkey -alias broker -keyalg RSA -keystore broker.ks
+
+Next, export the certificate so that it can be shared with clients:
+
+    $ keytool -export -alias broker -keystore broker.ks -file broker_cert
+
+Create a client truststore that imports the broker certificate:
+
+    $ keytool -import -alias broker -keystore client.ts -file broker_cert
+
+Generate a self-signed certificate for the broker trust store:
+
+    $ keytool -genkey -alias broker -keyalg RSA -keystore broker.ts
+
+Note: When you import the broker_cert make sure that you specify yes to the dialog: Trust this certificate? [no]:  yes. The default setting is no.
+
+Create the `amq-poc-tls` secret:
+
+    oc create secret generic amq-poc-tls \
+    --from-file=broker.ks \
+    --from-literal=keyStorePassword=password \
+    --from-file=client.ts=broker.ts \
+    --from-literal=trustStorePassword=password
+
+Let's try to check if the connection is working, connecting to the HOST:
+
+Export the variables acording with your setup:
+
+    URL=amqps://my-source-cluster-acceptor-0-svc-rte-poc.apps.cluster-2hr77.2hr77.sandbox2997.opentlc.com:443
+    USER=admin
+    PASS=admin
+    TS_LOCATION=/Users/rramalho/coding/artemis-showcase/ansible/roles/amq-broker/files/client.ts
+    TS_PASSWORD=password
+    VERIFYHOST=false
+
+Do the connection using the Artemis CLI tool:
+
+    artemis producer --url "$URL?jms.username=$USER&jms.password=$PASS&transport.trustStoreLocation=$TS_LOCATION&transport.trustStorePassword=$TS_PASSWORD&transport.verifyHost=false" --threads 1 --protocol amqp --message-count 10 --destination 'queue://tecban.foo'
+
+Consuming Messages:
+
+    artemis consumer --url "$URL?jms.username=$USER&jms.password=$PASS&transport.trustStoreLocation=$TS_LOCATION&transport.trustStorePassword=$TS_PASSWORD&transport.verifyHost=false"  --threads 1 --protocol amqp --message-count 10 --destination 'queue://tecban.foo'

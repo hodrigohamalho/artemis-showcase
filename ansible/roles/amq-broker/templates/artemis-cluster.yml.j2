@@ -9,11 +9,10 @@ spec:
     name: acceptor
     port: 5672
     protocols: amqp,openwire
-  - anycastPrefix: jms.queue.
-    multicastPrefix: /topic/
-    name: mirror
-    port: 5673
-    protocols: amqp
+    expose: true
+    sslEnabled: true
+    sslSecret: amq-poc-tls
+    verifyHost: false
   addressSettings: {}
   adminPassword: admin
   adminUser: admin

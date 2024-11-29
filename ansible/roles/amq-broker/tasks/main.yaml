@@ -37,8 +37,8 @@
     namespace: '{{ namespace }}'
     resource_definition: "{{ lookup('template', 'artemis-cluster.yml.j2') }}"
 
-- name: Create AMQ Broker with Security
-  k8s:
-    state: present
-    namespace: '{{ namespace }}'
-    resource_definition: "{{ lookup('template', 'artemis-cluster-security.yml.j2') }}"
+# - name: Create AMQ Broker with Security
+#   k8s:
+#     state: present
+#     namespace: '{{ namespace }}'
+#     resource_definition: "{{ lookup('template', 'artemis-cluster-security.yml.j2') }}"
