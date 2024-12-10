@@ -8,11 +8,15 @@ From Apache ActiveMQ you can download the broker as a `.zip` or `.tar.gz` file.
 
 Unzip/tar the archive, and start a terminal.
 
-Change directory to the unzipped directory and start the broker.
+Change directory to the unzipped directory, create and start the broker.
 
-    bin/activemq console
+    bin/artemis create mybroker
+    cd bin/artemis/mybroker/bin
+    ./artemis run
 
-Which runs the broker in the foreground and logs to the console.
+You can access the Artemis Web Console in
+
+http://localhost:8181
 
 === How to run the example
 
