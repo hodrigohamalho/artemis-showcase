@@ -25,6 +25,13 @@
 #   delay: 10
 #   until: r_amq_operator_pod.resources | list | length == 1
 
+- name: Create TLS Secret
+  k8s:
+    state: present
+    namespace: '{{ namespace }}'
+    resource_definition: "{{ lookup('file', 'amq-poc-tls-secret.yml') }}"
+
+
 - name: Create JAAS Secret
   k8s:
     state: present

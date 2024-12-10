@@ -28,13 +28,13 @@
           metadata:
             name: "{{ namespace }}"
 
-    - name: Include AMQ Broker
-      include_role:
-        name: amq-broker
-
-    # - name: Include Applications
+    # - name: Include AMQ Broker
     #   include_role:
-    #     name: apps
+    #     name: amq-broker
+
+    - name: Include Applications
+      include_role:
+        name: apps
 
     # - name: Include Monitoring
     #   include_role:

@@ -169,4 +169,10 @@ Do the connection using the Artemis CLI tool:
 
 Consuming Messages:
 
-    artemis consumer --url "$URL?jms.username=$USER&jms.password=$PASS&transport.trustStoreLocation=$TS_LOCATION&transport.trustStorePassword=$TS_PASSWORD&transport.verifyHost=false"  --threads 1 --protocol amqp --message-count 10 --destination 'queue://tecban.foo'
+    artemis consumer --url "$URL?jms.username=$USER&jms.password=$PASS&transport.trustStoreLocation=$TS_LOCATION&transport.trustStorePassword=$TS_PASSWORD&transpo rt.verifyHost=false"  --threads 1 --protocol amqp --message-count 10 --destination 'queue://tecban.foo'
+
+
+
+
+amqps://my-source-cluster-acceptor-0-svc-rte-poc.apps.cluster-2hr77.2hr77.sandbox2997.opentlc.com:443
+http://teste-broker-wconsj-0-svc-rte-poc-amq-gruposwitch.apps.osccorpdev.tecban.com/
