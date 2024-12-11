@@ -26,19 +26,22 @@ public class SampleAutowiredAmqpRoute extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        from("file:src/main/data?noop=true")
-            .id("file-consumer-route")
-            .to("amqp:queue:SCIENCEQUEUE");
 
-        from("timer:bar")
-            .id("timer-consumer-route")
-            .setBody(constant("Hello from Camel"))
-            .to("amqp:queue:SCIENCEQUEUE")
+        // from("timer:produce-amq")
+        //     .id("artemis-route")
+        //     .setBody(constant("Hello from Camel to Artemis"))
+        //     .to("amqp:queue:SCIENCEQUEUE")
+        //     .log("Message sent from route ${routeId} to SCIENCEQUEUE");
+        
+        from("timer:produce-ibm")
+            .id("ibm-route")
+            .setBody(constant("Hello from Camel for IBM"))
+            .to("wmq:queue:SCIENCEQUEUE")
             .log("Message sent from route ${routeId} to SCIENCEQUEUE");
         
-        from("amqp:queue:SCIENCEQUEUE?receiveTimeout=10000")
-            .id("amqp-consumer-route")
-	        .id("consumer-route")
-	        .to("log:MyLogger?showBody=true");
+        // from("amqp:queue:SCIENCEQUEUE?receiveTimeout=10000")
+        //     .id("amqp-consumer-route")
+	    //     .id("consumer-route")
+	    //     .to("log:MyLogger?showBody=true");
     }
 }

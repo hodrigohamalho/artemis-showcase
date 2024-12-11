@@ -1,71 +1,66 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package sample.camel;
 
+import com.ibm.mq.jakarta.jms.MQQueueConnectionFactory;
+import com.ibm.msg.client.jakarta.wmq.WMQConstants;
+
+import org.apache.camel.component.jms.JmsComponent;
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
+
 
 @Configuration
 public class AmqpConfig {
 
     // configuration of the AMQP connection factory.
     @Value("${AMQP_SERVICE_USERNAME}")
-    private String userName;
+    private String artemisUserName;
    
     @Value("${AMQP_SERVICE_PASSWORD}")
-    private String pass;
+    private String artemisPassword;
 
     @Value("${AMQP_REMOTE_URI}")
     private String remoteUri;
 
+    @Value("${MQ_HOSTNAME}")
+    private String mqHostname;
 
-    public String getUserName() {
-        return userName;
-    }
+    @Value("${MQ_CHANNEL}")
+    private String mqChannel;
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
+    @Value("${MQ_QUEUE_MANAGER}")
+    private String mqQueueManager;
 
-    public String getPass() {
-        return pass;
-    }
+    @Value("${MQ_PORT}")
+    private int mqPort;
 
-    public void setPass(String pass) {
-        this.pass = pass;
-    }
+    @Value("${MQ_USERNAME}")
+    private String mqUserName;
 
-    public String getRemoteUri() {
-        return remoteUri;
-    }
-
-    public void setRemoteUri(String remoteUri) {
-        this.remoteUri = remoteUri;
-    }
+    @Value("${MQ_PASSWORD}")
+    private String mqPassword;
     
     // @Bean
     public org.apache.qpid.jms.JmsConnectionFactory amqpConnectionFactory() {
         org.apache.qpid.jms.JmsConnectionFactory jmsConnectionFactory = new org.apache.qpid.jms.JmsConnectionFactory();
         jmsConnectionFactory.setRemoteURI(remoteUri);
-        jmsConnectionFactory.setUsername(userName);
-        jmsConnectionFactory.setPassword(pass);
+        jmsConnectionFactory.setUsername(artemisUserName);
+        jmsConnectionFactory.setPassword(artemisPassword);
         return jmsConnectionFactory;
+    }
+
+    @Bean 
+    public JmsComponent amqp() throws Exception {
+        org.apache.qpid.jms.JmsConnectionFactory jmsConnectionFactory = new org.apache.qpid.jms.JmsConnectionFactory();
+        jmsConnectionFactory.setRemoteURI(remoteUri);
+        jmsConnectionFactory.setUsername(artemisUserName);
+        jmsConnectionFactory.setPassword(artemisPassword);
+        // Create the Camel JMS component and wire it to our Artemis connectionfactory         
+        JmsComponent jms = new JmsComponent();
+        jms.setConnectionFactory(jmsConnectionFactory);
+        return jms;
     }
 
     /* Recommendation is to use connection pooling. 
@@ -80,4 +75,42 @@ public class AmqpConfig {
         jmsPoolConnectionFactory.setConnectionFactory(amqpConnectionFactory());
         return jmsPoolConnectionFactory;
     }
+
+    @Bean 
+    public JmsComponent wmq() {
+        JmsComponent jmsComponent = new JmsComponent();
+        jmsComponent.setConnectionFactory(mqQueueConnectionFactory());
+        return jmsComponent;
+    }
+
+    @Bean 
+    public MQQueueConnectionFactory mqQueueConnectionFactory() {
+        MQQueueConnectionFactory cf = new MQQueueConnectionFactory();
+        
+        try {
+            cf.setHostName(mqHostname);
+            cf.setPort(mqPort);
+            cf.setQueueManager(mqQueueManager);
+            cf.setChannel(mqChannel);
+            cf.setTransportType(WMQConstants.WMQ_CM_CLIENT);
+            cf.setStringProperty(WMQConstants.USERID, mqUserName);
+            cf.setStringProperty(WMQConstants.PASSWORD, mqPassword);
+            cf.setBooleanProperty(WMQConstants.USER_AUTHENTICATION_MQCSP, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return cf;
+    }
+
+    // @Bean 
+    // public UserCredentialsConnectionFactoryAdapter userCredentialsConnectionFactoryAdapter(MQQueueConnectionFactory mqQueueConnectionFactory) {
+    //     UserCredentialsConnectionFactoryAdapter adapter = new UserCredentialsConnectionFactoryAdapter();
+    //     adapter.setUsername(mqUserName);
+    //     adapter.setPassword(mqPassword);
+    //     adapter.setTargetConnectionFactory(mqQueueConnectionFactory);
+
+    //     return adapter; 
+    // }
+    
 }

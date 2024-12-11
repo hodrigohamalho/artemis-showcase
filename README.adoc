@@ -171,5 +171,25 @@ Consuming Messages:
 
     artemis consumer --url "$URL?jms.username=$USER&jms.password=$PASS&transport.trustStoreLocation=$TS_LOCATION&transport.trustStorePassword=$TS_PASSWORD&transpo rt.verifyHost=false"  --threads 1 --protocol amqp --message-count 10 --destination 'queue://tecban.foo'
 
+=== MQ Series to ActiveMQ Artemis bridge with Apache Camel
 
-image::img/message-migration.drawio.png[]
+docker run \
+    --name=artemis -d \
+    -p 8161:8161 \
+    -p 61616:61616 \
+    -p 5672:5672 \
+    -e ARTEMIS_USER=admin \
+    -e ARTEMIS_PASSWORD=admin \
+    apache/activemq-artemis
+
+docker run \
+  --env LICENSE=accept \
+  --env MQ_QMGR_NAME=QM1 \
+  --env MQ_ADMIN_PASSWORD="admin" \
+  --volume ~/ibm-mq-data:/var/mqm \
+  --volume ~/ibm-mq-config:/etc/mqm \
+  --publish 1414:1414 \
+  --publish 9443:9443 \
+  --detach \
+  icr.io/ibm-messaging/mq
+
