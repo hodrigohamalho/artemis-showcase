@@ -173,6 +173,10 @@ Consuming Messages:
 
 === MQ Series to ActiveMQ Artemis bridge with Apache Camel
 
+This application through a whitelist of queues, take messages from IBM MQ and insert into ActiveMQ Artemis.
+
+image::img/messaging-mirroring.jpg[]
+
 Running it locally, run the Artemis container:
 
     docker run \
