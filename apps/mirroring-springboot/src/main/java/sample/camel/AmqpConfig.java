@@ -88,6 +88,7 @@ public class AmqpConfig {
         MQQueueConnectionFactory cf = new MQQueueConnectionFactory();
         
         try {
+            cf.setAppName("Mirroring");
             cf.setHostName(mqHostname);
             cf.setPort(mqPort);
             cf.setQueueManager(mqQueueManager);
