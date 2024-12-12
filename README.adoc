@@ -173,23 +173,52 @@ Consuming Messages:
 
 === MQ Series to ActiveMQ Artemis bridge with Apache Camel
 
-docker run \
-    --name=artemis -d \
-    -p 8161:8161 \
-    -p 61616:61616 \
-    -p 5672:5672 \
-    -e ARTEMIS_USER=admin \
-    -e ARTEMIS_PASSWORD=admin \
-    apache/activemq-artemis
+Running it locally, run the Artemis container:
 
-docker run \
-  --env LICENSE=accept \
-  --env MQ_QMGR_NAME=QM1 \
-  --env MQ_ADMIN_PASSWORD="admin" \
-  --volume ~/ibm-mq-data:/var/mqm \
-  --volume ~/ibm-mq-config:/etc/mqm \
-  --publish 1414:1414 \
-  --publish 9443:9443 \
-  --detach \
-  icr.io/ibm-messaging/mq
+    docker run \
+        --name=artemis -d \
+        -p 8161:8161 \
+        -p 61616:61616 \
+        -p 5672:5672 \
+        -e ARTEMIS_USER=admin \
+        -e ARTEMIS_PASSWORD=admin \
+        apache/activemq-artemis
+
+You can access the web console in http://localhost:8161 with the credentials `admin`, `admin`.
+
+image::img/artemis-console.png[]
+
+To Run the IBM MQ, first create a volume.
+
+    docker volume create qm1data
+
+    docker run \
+        --name=ibm-messaging -d \
+        --env LICENSE=accept \
+        --env MQ_QMGR_NAME=QM1 \
+        --env MQ_ADMIN_PASSWORD="admin" \
+        --volume qm1data:/mnt/mqm \
+        --publish 1414:1414 \
+        --publish 9443:9443 \
+        icr.io/ibm-messaging/mq
+
+You can access the web console in https://localhost:9443 with the credentials `admin`, `admin`.
+
+image::img/ibm-console-01.png[]
+
+image::img/ibm-console-02.png[]
+
+
+Create the `SCIENCEQUEUE` queue. 
+
+image::img/ibm-create-queue-01.png[]
+
+image::img/ibm-create-queue-02.png[]
+
+Once it's running, start the bridge:
+
+    cd amqp-springboot
+    mvn spring-boot:run
+
+
 
