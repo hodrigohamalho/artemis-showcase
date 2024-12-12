@@ -2,7 +2,7 @@
 
 This example shows how to work with a simple Apache Camel application using Spring Boot and Apache ActiveMQ.
 
-=== Preparing ActiveMQ brokers
+=== Preparing ActiveMQ Artemis Brokers
 
 From Apache ActiveMQ you can download the broker as a `.zip` or `.tar.gz` file.
 

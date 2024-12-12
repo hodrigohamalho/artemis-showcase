@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  artemis:
+    image: apache/activemq-artemis
+    container_name: artemis
+    ports:
+      - "8161:8161"  # Management Console
+      - "61616:61616" # OpenWire Protocol
+      - "5672:5672"   # AMQP Protocol
+    environment:
+      ARTEMIS_USER: admin
+      ARTEMIS_PASSWORD: admin
+    restart: always
+
+  ibm-messaging:
+    image: icr.io/ibm-messaging/mq
+    container_name: ibm-messaging
+    environment:
+      LICENSE: accept
+      MQ_QMGR_NAME: QM1
+      MQ_ADMIN_PASSWORD: admin
+    volumes:
+      - qm1data:/mnt/mqm  # Volume persistente para dados do IBM MQ
+    ports:
+      - "1414:1414" # MQ Client Protocol
+      - "9443:9443" # MQ Web Console
+    restart: always
+
+volumes:
+  qm1data:
+    driver: local

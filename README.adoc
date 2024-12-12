@@ -208,6 +208,9 @@ image::img/ibm-console-01.png[]
 
 image::img/ibm-console-02.png[]
 
+If you prefer you can just use the `docker-compose up` to run the containers.
+
+Now let's create the `SCIENCEQUEUE` in the `IBM MQ`.
 
 Create the `SCIENCEQUEUE` queue. 
 
@@ -217,7 +220,7 @@ image::img/ibm-create-queue-02.png[]
 
 Once it's running, start the bridge:
 
-    cd amqp-springboot
+    cd messaging-mirroring
     mvn spring-boot:run
 
 
