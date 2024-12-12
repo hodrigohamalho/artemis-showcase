@@ -223,5 +223,12 @@ Once it's running, start the bridge:
     cd messaging-mirroring
     mvn spring-boot:run
 
+Take a look to see if the messages going to IBM is being replicated to Artemis.
+
+image::img/messages-in-ibm.png[]
+
+image::img/messages-in-artemis.png[]
+
+All the configuration details is in the `application.properties`, including the queues list that will be replicated indicated by the property `queue.whitelist` a comma sepparated list.
 
 
